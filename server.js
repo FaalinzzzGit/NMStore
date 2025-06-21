@@ -1,21 +1,4 @@
 const express = require("express");
-const path = require("path");
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-app.use(express.static(path.join(__dirname, "public")));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-const fs = require("fs");
-const dataDir = path.join(__dirname, "data");
-const imagesDir = path.join(__dirname, "public", "images");
-
-if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
-if (!fs.existsSync(imagesDir)) fs.mkdirSync(imagesDir);
-
-const express = require("express");
 const bodyParser = require("body-parser");
 const multer = require("multer");
 const path = require("path");
