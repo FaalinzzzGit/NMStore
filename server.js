@@ -11,6 +11,14 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+if (!fs.existsSync(path.join(__dirname, "data"))) {
+  fs.mkdirSync(path.join(__dirname, "data"));
+}
+
+if (!fs.existsSync(path.join(__dirname, "public", "images"))) {
+  fs.mkdirSync(path.join(__dirname, "public", "images"));
+}
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "public/images/");
@@ -22,6 +30,10 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 const productsFilePath = path.join(__dirname, "data", "products.json");
+
+if (!fs.existsSync(productsFilePath)) {
+  fs.writeFileSync(productsFilePath, "[]");
+}
 
 function getProducts() {
   try {
@@ -87,7 +99,6 @@ app.delete("/api/products/:id", (req, res) => {
         const filePath = path.join(__dirname, "public", url);
         fs.unlink(filePath, (err) => {
           if (err) console.error(`Error deleting file ${filePath}:`, err);
-          else console.log(`Deleted file: ${filePath}`);
         });
       });
     }
@@ -97,8 +108,8 @@ app.delete("/api/products/:id", (req, res) => {
   }
 });
 
-const ADMIN_USERNAME = "adminnmstore";
-const ADMIN_PASSWORD = "?2T9,]3j)4aE";
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "adminnmstore";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "?2T9,]3j)4aE";
 
 app.post("/api/admin/login", (req, res) => {
   const { username, password } = req.body;
@@ -119,7 +130,10 @@ app.get("/admin-panel", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "admin-panel.html"));
 });
 
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
 app.listen(PORT, () => {
-  console.log(`Server berjalan di http://localhost:${PORT}`);
-  console.log(`Halaman admin: http://localhost:${PORT}/admin`);
+  console.log(`Server berjalan di port ${PORT}`);
 });
